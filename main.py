@@ -46,7 +46,11 @@ def transform_ecommerce_data(df):
     
     
 def transform_cupones_Data(df):
-    return df.dropna(how='all',inplace=True)
+    df['Discount coupon'] = pd.to_numeric(df['Discount coupon'], errors='coerce')
+    df.dropna(how='any', inplace=True)
+
+
+    return df
 
 
 
@@ -60,7 +64,7 @@ fernet = Fernet(encryption_key)
 
 # Function to encrypt a column
 def encrypt_column(column, fernet_obj):
-    return column.apply(lambda x: fernet_obj.encrypt(str(x).encode()).decode())
+    return column.apply(lambda x: fernet_obj.encrypt(str(x).encode()))
 
 # Function to decrypt a column
 def decrypt_column(column, fernet_obj):
@@ -68,13 +72,19 @@ def decrypt_column(column, fernet_obj):
 
 
 ecommerce_df_transformed=transform_ecommerce_data(ecommerce_df)
+cupones_df_transformed= transform_cupones_Data(cupones_df)
 
-# Encrypt the 'SensitiveData' column
+
+
+# # Encrypt the 'e' column
 ecommerce_df_transformed['CustomerID'] = encrypt_column(ecommerce_df_transformed['CustomerID'], fernet)
-
+cupones_df_transformed['CustomerID'] = encrypt_column(cupones_df_transformed['CustomerID'], fernet)
+print(cupones_df_transformed)
 
 connection=con.connect(host=mysql_db_config['host'],user=mysql_db_config["user"],password=mysql_db_config["password"])
 cursor=connection.cursor()
+
+
 
 # Create a schema (if not exists)
 create_schema_query = "CREATE SCHEMA IF NOT EXISTS onlinestore"
@@ -108,6 +118,17 @@ cursor.execute("ALTER TABLE ecommerce MODIFY COLUMN UnitPrice FLOAT")
 
 
 
+cursor.execute("USE onlinestore")
+cursor.execute("SELECT * FROM ecommerce LIMIT 3")
+mysql_data = cursor.fetchall()
+
+
+column_names = [desc[0] for desc in cursor.description]
+mysql_df = pd.DataFrame(mysql_data, columns=column_names)
+
+Combination = pd.merge(cupones_df_transformed, mysql_df, how='left', on='CustomerID')
+
+
 
 # Commit the changes
 connection.commit()
@@ -117,4 +138,6 @@ cursor.close()
 connection.close()
 
 print("Table and schema created, and data uploaded.")
+
+
 
