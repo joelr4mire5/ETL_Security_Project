@@ -49,6 +49,9 @@ def transform_cupones_Data(df):
     return df.dropna(how='all',inplace=True)
 
 
+
+
+
 # Generate a random encryption key
 encryption_key = Fernet.generate_key()
 
@@ -101,8 +104,7 @@ cursor.executemany(insert_data_query, values)
 
 cursor.execute("ALTER TABLE ecommerce MODIFY COLUMN Quantity FLOAT")
 cursor.execute("ALTER TABLE ecommerce MODIFY COLUMN UnitPrice FLOAT")
-cursor.execute("""UPDATE your_table
-        SET InvoiceDate = STR_TO_DATE(InvoiceDate, '%m/%d/%Y %h:%i'""")
+
 
 
 
