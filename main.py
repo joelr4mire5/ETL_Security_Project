@@ -167,14 +167,14 @@ coupons = pd.read_sql(query_cupones, engine)
 
 
 # Specify the path where you want to save the CSV file
-ecommerce_csv_file_path = 'Output_data/ecommerce.csv'
+ecommerce_csv_file_path = 'Output_Data/ecommerce.csv'
 
 # Save the DataFrame to a CSV file
 ecommerce.to_csv(ecommerce_csv_file_path, index=False)
 
 
 # Specify the path where you want to save the CSV file
-coupons_csv_file_path = 'Output_data/coupons.csv'
+coupons_csv_file_path = 'Output_Data/coupons.csv'
 
 # Save the DataFrame to a CSV file
 coupons.to_csv(coupons_csv_file_path, index=False)
